@@ -1,47 +1,194 @@
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sister Verification & Importance Test 😂</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body class="bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 min-h-screen flex items-center justify-center p-4 font-sans text-white">
 
-  const { verdict, score, details } = req.body;
+  <div class="max-w-xl w-full bg-white/10 backdrop-blur-md rounded-2xl p-6 sm:p-8 border border-white/20 shadow-2xl">
+    
+    <!-- Header -->
+    <div class="text-center mb-6">
+      <h1 class="text-2xl sm:text-3xl font-extrabold tracking-wide text-pink-300">
+        ✨ Sister Verification Test ✨
+      </h1>
+      <p class="text-sm text-gray-200 mt-2">
+        Enakku oru chinna doubt... ivlo per kootathula na yaruku yaaru? Unmai mattum sollanum! 😜
+      </p>
+      <div class="w-full bg-white/20 h-2 rounded-full mt-4 overflow-hidden">
+        <div id="progress-bar" class="bg-pink-400 h-full transition-all duration-300 w-0"></div>
+      </div>
+    </div>
 
-  const RESEND_API_KEY = "re_isfsJGqd_MWZGJFk4nEijk2Ub2Mm7JAyH";
-  const TARGET_EMAIL = "pugazhenthinadarajan@gmail.com";
+    <!-- Question Container -->
+    <div id="quiz-container">
+      <div id="question-box" class="space-y-4"></div>
+    </div>
 
-  try {
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${RESEND_API_KEY}`,
-        'Content-Type': 'application/json',
+    <!-- Result / Sending Screen -->
+    <div id="result-container" class="hidden text-center space-y-6">
+      <div id="loading-state" class="space-y-4">
+        <div class="animate-spin inline-block w-10 h-10 border-4 border-pink-400 border-t-transparent rounded-full"></div>
+        <p class="text-lg font-semibold text-pink-200">
+          Unoda answers ah decode pannitu irukken... En email ku secret report pogudhu! 📨
+        </p>
+      </div>
+
+      <div id="final-screen" class="hidden space-y-4">
+        <h2 id="result-title" class="text-2xl font-bold text-yellow-300"></h2>
+        <p id="result-desc" class="text-gray-100 text-sm leading-relaxed"></p>
+        <div class="p-4 bg-white/10 rounded-xl border border-white/20 text-xs text-left space-y-2">
+          <p class="font-bold text-pink-300">Verdict sent to Pugazhenthi's mailbox ✅</p>
+          <p>Enna answers choose pannirukenu ella secretum report aayiruchu! Inimey no escaping! 🏃‍♂️💨</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: "1. Namma meet panni just 3 months dhaan aagudhu, but unakku en mela irukkura bond enna mari thonudhu?",
+        options: [
+          { text: "Just normal pass-by friend dhaan pa", points: 1 },
+          { text: "College senior madhiri helpful person", points: 2 },
+          { text: "Koodave porandhadha vida romba special bro! ❤️", points: 5 },
+          { text: "Yov, unna thavira enakku yaar irukka?", points: 4 }
+        ]
       },
-      body: JSON.stringify({
-        from: 'onboarding@resend.dev',
-        to: TARGET_EMAIL,
-        subject: `[Sister Quiz Report] Score: ${score}/25 - ${verdict}`,
-        html: `
-          <div style="font-family: Arial, sans-serif; padding: 20px; line-height: 1.5;">
-            <h2 style="color: #db2777;">Sister Importance Verification Report 📊</h2>
-            <p><strong>Verdict:</strong> ${verdict}</p>
-            <p><strong>Score:</strong> ${score} / 25</p>
-            <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
-            <h3 style="color: #4f46e5;">Detailed Selections:</h3>
-            <pre style="background: #f4f4f5; padding: 12px; border-radius: 6px; font-family: monospace; white-space: pre-wrap;">${details}</pre>
-          </div>
-        `,
-      }),
-    });
+      {
+        question: "2. Unakku oru periya problem or happy news vandha, first call yaaruku pogum?",
+        options: [
+          { text: "En Lover ku dhaan first phone call!", points: 2 },
+          { text: "En Bestie or College seniors ku", points: 2 },
+          { text: "En sontha brother ku", points: 3 },
+          { text: "First unakku dhaan solli advise kepen / share pannuven! 🔥", points: 5 }
+        ]
+      },
+      {
+        question: "3. En kooda sanda potta or naan konjam silent aana un reaction enna?",
+        options: [
+          { text: "Pona poraan vidu, vera velai illa", points: 1 },
+          { text: "Oru status pottu vittuduven", points: 2 },
+          { text: "Pesama irukka mudiyadhu, edhachu mokka panni pesiduven", points: 4 },
+          { text: "Manase thalakeela ayirum, un kitta pesura varaikum thookame varadhu 🥺", points: 5 }
+        ]
+      },
+      {
+        question: "4. Un life-la sontha thambi/annan, lover, best friends ellam irukanga... adhula en place enna?",
+        options: [
+          { text: "Time pass ku pesura friend mattum dhaan", points: 1 },
+          { text: "One of the good brothers in circle", points: 3 },
+          { text: "Blood relation illanalum, life-long kooda nikkura real Anna/Thambi! 💯", points: 5 },
+          { text: "Idhula compare ellam panna mudiyadhu, un place super special!", points: 4 }
+        ]
+      },
+      {
+        question: "5. 'You are important to me' nu sonniye... adhu entha alavukku genuine?",
+        options: [
+          { text: "Chumma flow-la vaai la vandha vaartha", points: 1 },
+          { text: "Friend-ah respect pannran avlo dhaan", points: 2 },
+          { text: "100% genuine! Blood connection dhaan mukkiyam nu illa, care dhaan mukkiyam! ✨", points: 5 }
+        ]
+      }
+    ];
 
-    const data = await response.json();
+    let currentQ = 0;
+    let totalScore = 0;
+    let userSelections = [];
 
-    if (!response.ok) {
-      console.error('Resend API Error:', data);
-      return res.status(response.status).json({ error: data });
+    const questionBox = document.getElementById("question-box");
+    const progressBar = document.getElementById("progress-bar");
+    const quizContainer = document.getElementById("quiz-container");
+    const resultContainer = document.getElementById("result-container");
+    const loadingState = document.getElementById("loading-state");
+    const finalScreen = document.getElementById("final-screen");
+    const resultTitle = document.getElementById("result-title");
+    const resultDesc = document.getElementById("result-desc");
+
+    function renderQuestion() {
+      const q = questions[currentQ];
+      progressBar.style.width = `${(currentQ / questions.length) * 100}%`;
+
+      questionBox.innerHTML = `
+        <h2 class="text-lg font-bold text-pink-200 mb-4">${q.question}</h2>
+        <div class="space-y-3">
+          ${q.options.map((opt, idx) => `
+            <button onclick="handleAnswer(${idx})" class="w-full text-left p-3.5 rounded-xl bg-white/10 hover:bg-pink-600/40 border border-white/20 transition-all active:scale-[0.98] flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-pink-500/50 flex items-center justify-center text-xs font-bold">${String.fromCharCode(65 + idx)}</span>
+              <span class="text-sm font-medium">${opt.text}</span>
+            </button>
+          `).join("")}
+        </div>
+      `;
     }
 
-    return res.status(200).json({ success: true, data });
-  } catch (error) {
-    console.error('Server Handler Error:', error);
-    return res.status(500).json({ error: error.message });
-  }
-}
+    window.handleAnswer = function(optIdx) {
+      const selected = questions[currentQ].options[optIdx];
+      totalScore += selected.points;
+      userSelections.push({
+        question: questions[currentQ].question,
+        chosen: selected.text,
+        points: selected.points
+      });
+
+      currentQ++;
+      if (currentQ < questions.length) {
+        renderQuestion();
+      } else {
+        finishQuiz();
+      }
+    };
+
+    async function finishQuiz() {
+      progressBar.style.width = "100%";
+      quizContainer.classList.add("hidden");
+      resultContainer.classList.remove("hidden");
+
+      let verdict = "";
+      if (totalScore >= 20) {
+        verdict = "Tier 1: Soul Sister Status! 👑";
+        resultTitle.innerText = "Verdict: Unakku naan romba romba mukkiyam! 🥹❤️";
+        resultDesc.innerText = "Blood relation illanalum, 3 months la oru periya bond form aayirukku. Lover, bestie yaar irundhalum un kitta en importance unmatched level!";
+      } else if (totalScore >= 14) {
+        verdict = "Tier 2: Very Special Priority Sister! ⭐";
+        resultTitle.innerText = "Verdict: One of the Most Trusted Persons! 🌟";
+        resultDesc.innerText = "College seniors, bestie nu periya circle irundhalum, un life-la enakku nalla oru safe & special place kuduthuruka!";
+      } else {
+        verdict = "Tier 3: Casual Buddy / Just Another Friend 👀";
+        resultTitle.innerText = "Verdict: Safe Zone / Casual Friend! 😅";
+        resultDesc.innerText = "Innum namma pathi unakku therila pola! En importance ah prove panna innum time venum pola!";
+      }
+
+      const formattedDetails = userSelections.map((item, idx) => 
+        `Q${idx + 1}: ${item.question}\nAnswer: ${item.chosen} (${item.points} pts)\n`
+      ).join("\n");
+
+      try {
+        await fetch('/api/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            verdict: verdict,
+            score: totalScore,
+            details: formattedDetails
+          })
+        });
+      } catch (err) {
+        console.error('Submission error:', err);
+      }
+
+      loadingState.classList.add("hidden");
+      finalScreen.classList.remove("hidden");
+      confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+    }
+
+    renderQuestion();
+  </script>
+</body>
+</html>
